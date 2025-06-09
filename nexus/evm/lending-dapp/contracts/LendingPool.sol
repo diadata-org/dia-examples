@@ -4,6 +4,7 @@ pragma solidity ^0.8.28;
 import "./MockERC20.sol";
 
 interface IDIAOracleV2 {
+    // returns latest price and timestamp
     function getValue(string memory) external view returns (uint128, 
              uint128);
 }
@@ -13,6 +14,7 @@ contract LendingPool {
     string private constant _assetSymbol = "BTC/USD";
 
     MockERC20 private _BTC;
+    MockERC20 private _USDT;
     MockERC20 private _aBTC; 
 
     uint256 public constant LTV_RATIO = 70;
@@ -27,11 +29,13 @@ contract LendingPool {
     constructor(
         address oracle_, 
         address BTC_,
-        address aBTC_
+        address aBTC_,
+        address USDT_
     ) {
         _diaOracle = IDIAOracleV2(oracle_);
         _BTC = MockERC20(BTC_);
         _aBTC = MockERC20(aBTC_);
+        _USDT = MockERC20(USDT_);
     }
 
     function supply(uint256 amount) external {
@@ -59,7 +63,8 @@ contract LendingPool {
 
         require((amount + _borrowedAmount[msg.sender]) <= allowedBorrowAmount, "Borrow amount exceeds TVL");
 
-        _BTC.transfer(msg.sender, amount);
+        // Assuming USDT is 1:1 with USD
+        _USDT.transfer(msg.sender, amount);
         _borrowedAmount[msg.sender] += amount;
 
         emit AmountBorrowed(msg.sender, amount);
