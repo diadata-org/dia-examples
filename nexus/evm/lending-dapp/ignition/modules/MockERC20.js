@@ -9,7 +9,11 @@ const MockERC20 = buildModule("MockERC20", (m) => {
     id: "aBTC",
   });
 
-  return { btcContract, abtcContract };
+  const usdtContract = m.contract("MockERC20", ["MockUSDT", "USDT"], {
+    id: "USDT",
+  });
+
+  return { btcContract, abtcContract, usdtContract };
 });
 
 module.exports = MockERC20;
